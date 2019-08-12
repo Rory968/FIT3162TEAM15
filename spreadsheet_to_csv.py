@@ -4,6 +4,10 @@ import xlrd
 import csv
 
 
+# This is a helper file that takes an excel workbook and converts it into a csv file.
+# Used in 'populate_database.py' file.
+
+
 def csv_from_xls(file, new_filename):
     '''This function takes a .xls file path and opens this workbook, from here it reads and writes each line to a csv file
     to be used inputting the data into a database.

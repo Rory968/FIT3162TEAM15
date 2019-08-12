@@ -3,11 +3,16 @@ import os
 import pymongo
 import pandas as pd
 import spreadsheet_to_csv as stc
+import seperator as sep
+
+
+# This script takes an excel workbook file and converts it into a csv file in order to populate a MongoDB database.
+# It will split the data in the csv by scientific display name and create a number of collections based on these names.
 
 
 def create_dict(dir):
-    ''' This function takes a csv file path and reads this file into the pandas dataframe,
-    From here is turns the dataframe into a dictionary to be input into the MongoDB collection.
+    ''' This function takes a csv file path and reads this file into the pandas data frame,
+    From here is turns the data frame into a dictionary to be input into the MongoDB collection.
 
     :param file: File path containing the csv file that has the data in it
     :return: Returns the data from the csv stored in a dictionary format
@@ -61,6 +66,12 @@ xls_file_path = r'C:\Users\Owner\Documents\photos\Project data\Monash_sample_VBA
 csv_file_path = r'C:\Users\Owner\Documents\photos\Project data\data.csv'
 directory = os.path.join("C:\\Users\\Owner\\Documents\\photos\\Project data\\Species\\")
 stc.csv_from_xls(xls_file_path, csv_file_path)
+
+
+# This block takes the initial csv and makes a directory with smaller csv files for each species.
+data = pd.read_csv(csv_file_path)
+names, species = sep.separate_types(data)
+sep.export_to_csv(names, species, directory)
 
 
 # This block takes the newly created csv file and populates the MongoDB database with it.
