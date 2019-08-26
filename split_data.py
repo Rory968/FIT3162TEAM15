@@ -58,6 +58,7 @@ def create_training_set(data, split_attr):
     df = pd.DataFrame(x_train)
     df[split_attr] = y_train
     # df[split_attr].value_counts().plot(kind='bar', title='Count (' + split_attr + ')')
+    # currently only splits into labels and coordinates, doesnt actually creates test set all there though.
     return x, y
 
 
@@ -78,7 +79,7 @@ def plot_2d(x, y, label='Classes'):
     two_marker = ['o', 's']
     for l, c, m in zip(np.unique(y), two_colour, two_marker):
         plt.scatter(x_new[y == l, 0],
-                    x_new[y == l, 1 or 3],
+                    x_new[y == l, 1],
                     c=c, linewidth=0.5, label=l, marker=m)
 
     plt.title(label)
@@ -164,15 +165,27 @@ Currently the random under-sampling is running but all options are there to be c
 This currently has base functionality and does not write to the data-base. These features will be added later according to plan.
 '''
 
-data_frame = read.read_collection('Species_DB', 'Antechinus_agilis')
-clean = clean_data(data_frame, 'RATING_INT')
-# print(data_frame['SCIENTIFIC_DISPLAY_NME'].head())
-x, y = create_training_set(clean[['LATITUDEDD_NUM', 'LONGITUDEDD_NUM', 'RATING_INT']], 'RATING_INT')
-plot_2d(x, y, 'Imbalanced dataset (2 PCA components)')
-# sm = oversampleSMOTE(x, y)[0]
-# ros = random_over(x, y)[0]
-# tl = tomek_under(x, y)[0]
-rus = random_under(x, y)[0]
-# print(rus.shape[0], rus.tolist())
+df = read.read_collection('Species_DB', 'Antechinus_agilis')
+
+
+rating_header = 'RATING_INT'
+points = df[['LATITUDEDD_NUM', 'LONGITUDEDD_NUM', rating_header]]
+points = points.dropna()
+points[points[rating_header] == 2] = 1
+points_x, points_y = create_training_set(points, rating_header)
+plot_2d(points_x, points_y, 'Imbalanced dataset (2 PCA components)')
+
+
+# Split the points into presence and absence points (for data frame)
+presence = points[points[rating_header] == 0]
+absence = points[points[rating_header] == 1]
+pres_x, pres_y = create_training_set(presence, rating_header)
+ab_x, ab_y = create_training_set(absence, rating_header)
+
+
+# sm = oversampleSMOTE(points_x, points_y)[0]
+# ros = random_over(points_x, points_y)[0]
+# tl = tomek_under(points_x, points_y)[0]
+rus = random_under(points_x, points_y)[0]
 # print(tl.shape[0], tl.tolist())
 
