@@ -177,15 +177,23 @@ plot_2d(points_x, points_y, 'Imbalanced dataset (2 PCA components)')
 
 
 # Split the points into presence and absence points (for data frame)
-presence = points[points[rating_header] == 0]
-absence = points[points[rating_header] == 1]
-pres_x, pres_y = create_training_set(presence, rating_header)
-ab_x, ab_y = create_training_set(absence, rating_header)
+# presence = points[points[rating_header] == 0]
+# absence = points[points[rating_header] == 1]
+# pres_x, pres_y = create_training_set(presence, rating_header)
+# ab_x, ab_y = create_training_set(absence, rating_header)
 
 
 # sm = oversampleSMOTE(points_x, points_y)[0]
 # ros = random_over(points_x, points_y)[0]
 # tl = tomek_under(points_x, points_y)[0]
-rus = random_under(points_x, points_y)[0]
+rus = random_under(points_x, points_y)
 # print(tl.shape[0], tl.tolist())
+sampled = pd.DataFrame(rus[0])
+labels = pd.DataFrame(rus[1])
 
+
+# Split the points into presence and absence points (for data frame)
+pres_x = sampled[labels[0] == 0]
+ab_x = sampled[labels[0] == 1]
+pres_y = labels[labels[0] == 0]
+ab_y = labels[labels[0] == 1]
