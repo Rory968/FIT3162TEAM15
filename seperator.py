@@ -45,9 +45,7 @@ def export_to_csv(list_of_names, list_of_df, file_path):
             raise
 
     for i in range(len(list_of_df)):
-        print(list_of_names[i])
         string = universal_file_path + list_of_names[i] + '.csv'
-        print(string)
         list_of_df[i].to_csv(string)
 
 

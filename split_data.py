@@ -1,5 +1,6 @@
 # Written by Rory Austin id: 28747194
 import pandas as pd
+import pymongo
 import numpy as np
 from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import RandomOverSampler
@@ -155,6 +156,26 @@ def random_under(x, y):
     return x_rus, y_rus
 
 
+def presence_absence(name, x):
+
+    client = pymongo.MongoClient('localhost', 27017)
+    pres = x[x[rating_header] == 0].drop(rating_header, axis=1)
+    pres = pres.to_dict('records')
+    abs = x[x[rating_header] == 2].drop(rating_header, axis=1)
+    abs = abs.to_dict('records')
+    print(pres)
+    mydb = client['Presence']
+    collection = mydb[name]
+    collection.insert(pres)
+
+    mydb = client['Absence']
+    collection = mydb[name]
+    collection.insert(abs)
+
+    client.close()
+
+
+
 
 '''
 This block of code splits and cleans the data and then oversamples the data and returns the corresponding data and its labels.
@@ -164,36 +185,11 @@ Currently the random under-sampling is running but all options are there to be c
 
 This currently has base functionality and does not write to the data-base. These features will be added later according to plan.
 '''
-
 df = read.read_collection('Species_DB', 'Antechinus_agilis')
-
-
 rating_header = 'RATING_INT'
 points = df[['LATITUDEDD_NUM', 'LONGITUDEDD_NUM', rating_header]]
 points = points.dropna()
-points[points[rating_header] == 2] = 1
-points_x, points_y = create_training_set(points, rating_header)
-plot_2d(points_x, points_y, 'Imbalanced dataset (2 PCA components)')
-
-
-# Split the points into presence and absence points (for data frame)
-# presence = points[points[rating_header] == 0]
-# absence = points[points[rating_header] == 1]
-# pres_x, pres_y = create_training_set(presence, rating_header)
-# ab_x, ab_y = create_training_set(absence, rating_header)
-
-
-# sm = oversampleSMOTE(points_x, points_y)[0]
-# ros = random_over(points_x, points_y)[0]
-# tl = tomek_under(points_x, points_y)[0]
-rus = random_under(points_x, points_y)
-# print(tl.shape[0], tl.tolist())
-sampled = pd.DataFrame(rus[0])
-labels = pd.DataFrame(rus[1])
-
-
-# Split the points into presence and absence points (for data frame)
-pres_x = sampled[labels[0] == 0]
-ab_x = sampled[labels[0] == 1]
-pres_y = labels[labels[0] == 0]
-ab_y = labels[labels[0] == 1]
+# points[points[rating_header] == 2] = 1
+# points_x, points_y = create_training_set(points, rating_header)
+# plot_2d(points_x, points_y, 'Imbalanced dataset (2 PCA components)')
+presence_absence('Antechinus_agilis', points)

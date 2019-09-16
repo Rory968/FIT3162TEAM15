@@ -25,7 +25,7 @@ def csv_from_xls(file, new_filename):
         # Define the sheet for importing.
         sheet = workbook.sheet_by_name(sheet_name)
         # Create a new csv file with utf-8 encoding.
-        print("[+] Creating file")
+        print("[+] Creating CSV")
         csv_file = open(new_filename, 'w', encoding='utf-8-sig')
         writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
         # Write each row to the csv file.
