@@ -5,9 +5,6 @@ import pymongo
 import pandas as pd
 import spreadsheet_to_csv as stc
 import seperator as sep
-import rpy2.robjects as robjects
-import rpy2.robjects.packages as rpackages
-from rpy2.robjects.vectors import StrVector
 import subprocess
 
 # This script takes an excel workbook file and converts it into a csv file in order to populate a MongoDB database.
@@ -74,21 +71,6 @@ def find_path(name):
             return os.path.join(root, name)
 
 
-def r_script_setup(names):
-    package_names = ['mongolite', 'caret', 'DMwR', 'dplyr', 'usdm', 'sp', 'mapview']
-    if all(rpackages.isinstalled(x) for x in package_names):
-        have_package = True
-    else:
-        have_package = False
-    if not have_package:
-        utils = rpackages.importr('utils')
-        utils.chooseCRANmirror(ind=1)
-        to_install = [x for x in package_names if not rpackages.isinstalled(x)]
-        if len(to_install) > 0:
-            utils.install_packages(StrVector(to_install))
-    base = rpackages.importr('base')
-
-
 # This block establishes the file paths and transfers the xls file to the csv file.
 # Create a folder in the Documents\photos path called Project data and download the xls in there.
 len(sys.argv)
@@ -114,6 +96,16 @@ sample_data_names, sample_data_dict = create_dict(directory)
 clean_names = clean_names(sample_data_names)
 #print(clean_names, len(sample_data_dict))
 populate(clean_names, sample_data_dict)
+
+
+command = "Rscript"
+r_file = find_path("cleaner.R")
+setup = find_path("setup.R")
+subprocess.call(["Rscript", setup])
+for name in names:
+    cmd = [command, r_file, name]
+    subprocess.call(cmd)
+
 
 
 
