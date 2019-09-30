@@ -6,6 +6,7 @@ import pandas as pd
 import spreadsheet_to_csv as stc
 import seperator as sep
 import subprocess
+import time
 
 # This script takes an excel workbook file and converts it into a csv file in order to populate a MongoDB database.
 # It will split the data in the csv by scientific display name and create a number of collections based on these names.
@@ -54,6 +55,11 @@ def populate(list_names, list_df):
     '''
     client = pymongo.MongoClient('localhost', 27017)
     mydb = client['raw_data']
+    dbs = client.list_database_names()
+    critical = ['admin', 'config', 'local']
+    for name in dbs:
+        if name not in critical:
+            client.drop_database(name)
     for i in range(len(list_names)):
         collection = mydb[list_names[i]]
         collection.insert_many(list_df[i])
@@ -73,6 +79,7 @@ def find_path(name):
 
 # This block establishes the file paths and transfers the xls file to the csv file.
 # Create a folder in the Documents\photos path called Project data and download the xls in there.
+start = time.time()
 len(sys.argv)
 file = sys.argv[1]
 filepath = find_path(file)
@@ -100,12 +107,17 @@ populate(clean_names, sample_data_dict)
 
 command = "Rscript"
 r_file = find_path("cleaner.R")
-setup = find_path("setup.R")
-subprocess.call(["Rscript", setup])
+# setup = find_path("setup.R")
+# subprocess.call(["Rscript", setup])
+print("[+] Beginning split and clean process...")
 for name in names:
+    name = name.replace(' ', '_')
+    name = name.replace('.', '')
     cmd = [command, r_file, name]
     subprocess.call(cmd)
-
+end = time.time()
+print("[+] Data split and clean completed.")
+print("[+] Overall time taken: "+str((end-start)/60)+' minutes')
 
 
 
