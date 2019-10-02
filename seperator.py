@@ -1,6 +1,6 @@
 # Written by Rory Austin id: 28747194
+
 from errno import EEXIST
-import pandas as pd
 import os
 
 # This is a helper file used to separate a csv file based on a name and create a number of smaller files.
@@ -45,11 +45,6 @@ def export_to_csv(list_of_names, list_of_df, file_path):
             raise
 
     for i in range(len(list_of_df)):
-        string = universal_file_path + list_of_names[i] + '.csv'
+        string = str(universal_file_path) + list_of_names[i] + '.csv'
         list_of_df[i].to_csv(string)
-
-
-# data = pd.read_csv(r'C:\Users\Owner\Documents\photos\Project data\data.csv')
-# names, species = separate_types(data)
-# export_to_csv(names, species, r"C:\Users\Owner\Documents\photos\Project data\Species\ ")
 
