@@ -10,6 +10,7 @@ from sklearn import metrics
 import pymongo
 import pandas as pd
 import models as m
+from xlwt import Workbook
 
 
 def get_data(client_address, client_name, col_name):
@@ -73,6 +74,9 @@ def main():
     test_labels = test_data[dbd.target_variable]
     test_features = test_data.drop(dbd.drop_features, axis=1)
     p.evaluate(name, test_features, test_labels)
+    test_features.to_csv('test.csv')
+
+    p.predict(name, 'test.csv')
 
 
 if __name__ == "__main__":
