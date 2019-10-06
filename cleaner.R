@@ -5,6 +5,7 @@
 #Getting point data from database
 #--------------------------------
 zz <- file("messages.Rout", open="wt")
+sink(zz, type="output")
 sink(zz, type="message")
 library(mongolite)
 library(dplyr)
@@ -16,6 +17,7 @@ library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
 name <- str_replace_all(as.character(args), "[\r\n]", "")
+
 # Establishes a connection with the database
 require(mongolite)
 connection <- mongo(collection = name, db = "raw_data", url = "mongodb://localhost")
@@ -42,9 +44,13 @@ v2 <- vifcor(bio,th=0.9)
 
 # Removes raster layers with colinearity issues
 biom <- exclude(bio, v1, v2)
+# Stores used features in the database for future prediction use
+features <- data.frame(names(biom))
+require(mongolite)
+connection <- mongo(collection = name, db = "features", url = "mongodb://localhost")
+connection$insert(features)
+connection$disconnect()
 #-------------------------------------------
-
-
 # Turn rating value into a factor
 points$RATING_INT = as.factor(points$RATING_INT)
 

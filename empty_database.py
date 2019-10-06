@@ -1,10 +1,16 @@
 import pymongo
 import sys
+import database_details as dbd
 
 
 def remove():
+    '''
+    This function looks through the database and removes all non essential
+    databases found within the client.
+    :return: returns nothing.
+    '''
     print("[+] Removing non essential databases...")
-    client = pymongo.MongoClient('localhost', 27017)
+    client = pymongo.MongoClient(dbd.client_n, dbd.client_address)
     dbs = client.list_database_names()
     critical = ['admin', 'config', 'local']
     for name in dbs:

@@ -70,11 +70,15 @@ def populate(list_names, list_df, db_name, client_name, client_id):
 
 
 def find_path(name):
+    '''
+    Small function that finds the file path for a given filename in a given system.
+    :param name: filename.
+    :return: returns the path of the file as a string.
+    '''
     print("[+] Searching for " + name)
-    for root, dirs, files in os.walk(Path("C:/")):
+    for root, dirs, files in os.walk(str(Path.home())):
 
         if name in files:
-            print("[+] Found at " + os.path.join(root, name))
             return os.path.join(root, name)
 
 
@@ -88,20 +92,40 @@ def main():
     # Create a folder in the Documents\photos path called Project data and download the xls in there.
     start = time.time()
     len(sys.argv)
-    file = sys.argv[1]
+    try:
+        file = sys.argv[1]
+    except IndexError:
+        print("Must provide filename as argument.")
+        return
+    if not file.endswith('.xls'):
+        print("File must be in .xls format.")
+        return
     filepath = find_path(file)
+    if filepath is None:
+        print("File does not exist, provide available file")
+        sys.exit()
     cwd = os.getcwd()
 
     # This block establishes all of the filepaths for all of the files.
     # After it stores a csv file of the raw data for backup purposes and uses this to
     # Write to the database.
     xls_file_path = filepath
-    csv_file_path = Path('C:/Users/Owner/Documents/photos/Project data/data.csv')
-    directory = Path("C:/Users/Owner/Documents/photos/Project data/Species/")
+    try:
+        os.mkdir(os.path.join(cwd, 'Project data'))
+    except FileExistsError:
+        xls_file_path = xls_file_path
+    csv_file_path = Path(os.path.join(cwd, 'Project data', 'data.csv'))
+    directory = Path(os.path.join(cwd, "Project data", "Species"))
     stc.csv_from_xls(xls_file_path, csv_file_path)
-
     # This block takes the initial csv and makes a directory with smaller csv files for each species.
     data = pd.read_csv(csv_file_path)
+    necessary = [dbd.target_variable, dbd.long, dbd.lat]
+    try:
+        for element in necessary:
+            temp = data[element]
+    except KeyError:
+        print("Data must contain 'LONGITUDEDD_NUM', 'LATITUDEDD_NUM' and 'RATING_INT' features.")
+        return
     names, species = sep.separate_types(data)
     sep.export_to_csv(names, species, directory)
 
@@ -112,8 +136,6 @@ def main():
 
     command = "Rscript"
     r_file = find_path("cleaner.R")
-    # setup = find_path("setup.R")
-    # subprocess.call(["Rscript", setup])
     print("[+] Beginning split and clean process...")
     for name in names:
         name = name.replace(' ', '_')

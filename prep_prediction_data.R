@@ -6,7 +6,13 @@
 #--------------------------------
 zz <- file("messages.Rout", open="wt")
 sink(zz, type="message")
+sink(zz, type="output")
 library(mongolite)
+library(dplyr)
+library(sp)
+library(caret)
+library(usdm)
+library(DMwR)
 library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -17,26 +23,29 @@ connection <- mongo(collection = name, db = "temp", url = "mongodb://localhost")
 points <- connection$find()
 connection$disconnect()
 points <- data.frame(points)
-points <- points[c("LATITUDEDD_NUM", "LONGITUDEDD_NUM", "RATING_INT")]
+points <- points[c("LATITUDEDD_NUM", "LONGITUDEDD_NUM")]
 #----------------
 # Get Raster data
 #----------------
 
 # Retrieves predictor(raster) values from the worldclim database, [global climate data]
 bio <- raster::getData("worldclim", var='bio', res=10)
+# Initializes library and looks for raster layers corresponding to training data
+connection <- mongo(collection = name, db = "features", url = "mongodb://localhost")
+features <- connection$find()
+connection$disconnect()
+features <- as.character(unlist(features))
+biom <- raster::dropLayer(bio, features)
 
-# Initializes library and looks for colinearity problems in the raster data
-v1 <- vifstep(bio)
-v2 <- vifcor(bio,th=0.9)
-
-# Removes raster layers with colinearity issues
-biom <- exclude(bio, v1, v2)
 #-------------------------------------------
 
-
+points <- points %>% dplyr::select("LATITUDEDD_NUM", "LONGITUDEDD_NUM")
+coordinates(points)<-~LONGITUDEDD_NUM+LATITUDEDD_NUM
 predictor <- extract(biom, points)
+points <- data.frame(points)
 predictor <- cbind(points, predictor)
 testing <- data.frame(predictor)
+#testing
 # predictor <- na.omit(testing)
 test_connection <- mongo(collection = name, db = "backlog", url = "mongodb://localhost")
 test_connection$insert(testing)

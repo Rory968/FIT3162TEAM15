@@ -5,6 +5,16 @@ import database_details as dbd
 
 
 def save_model(species, model, model_name, acc):
+    '''
+    This function takes a given model and its corresponding data and stores it in the
+    database.
+
+    :param species: name of the species it corresponds to.
+    :param model: the model object itself
+    :param model_name: the name of the model object eg. type of model
+    :param acc: the accuracy reading of the model.
+    :return: returns the details of the storage transaction.
+    '''
     pickled_model = pickle.dumps(model)
     client = pymongo.MongoClient(dbd.client_n, dbd.client_address)
     database = client[dbd.model_dbname]
@@ -17,6 +27,13 @@ def save_model(species, model, model_name, acc):
 
 
 def load_model(species):
+    '''
+    This function takes a species name and loads the pre trained model currently stored in the database that corresponds
+    to that name.
+
+    :param species: the name of the species.
+    :return: returns the model object.
+    '''
     json = {}
     client = pymongo.MongoClient(dbd.client_n, dbd.client_address)
     database = client[dbd.model_dbname]

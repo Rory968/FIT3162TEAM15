@@ -10,6 +10,7 @@ from sklearn import metrics
 import pymongo
 import pandas as pd
 import models as m
+import xlwt
 
 
 def get_data(client_address, client_name, col_name):
@@ -26,10 +27,16 @@ def get_data(client_address, client_name, col_name):
     collection = db[col_name]
     cursor = collection.find()
     train_df = pd.DataFrame(list(cursor))
+    if train_df.empty:
+        print("No data present, type 'list_names data' for possible arguments.")
+        sys.exit()
     db = client['testing_data']
     collection = db[col_name]
     cursor = collection.find()
     test_df = pd.DataFrame(list(cursor))
+    if test_df.empty:
+        print("Data set too small for test data, must get extra for accurate model.")
+        sys.exit()
     return train_df, test_df
 
 
@@ -48,7 +55,7 @@ def model_fit_and_evaluation(name_list, classifier_list, data):
     try:
         data[0][dbd.target_variable]
     except KeyError:
-        print("\nDatabase collection not present, Make sure name is typed correctly.")
+        print("Database collection not present, Make sure name is typed correctly.")
         return
     train_data = data[0]
     test_data = data[1]
@@ -64,7 +71,7 @@ def model_fit_and_evaluation(name_list, classifier_list, data):
         try:
             score = metrics.roc_auc_score(test_labels, pred)
         except ValueError:
-            print("\nOnly one class present in testing data. More data needed.")
+            print("Only one class present in testing data. More data needed.")
             return
         scores.append(score)
     return scores
@@ -93,20 +100,21 @@ def main():
     # After this is found it is stored in the database.
     warnings.filterwarnings("ignore")
     len(sys.argv)
-    name = sys.argv[1]
+    try:
+        name = sys.argv[1]
+    except IndexError:
+        print("Must provide data argument, use 'list_names data' for a list of arguments")
+        return
     data = get_data(dbd.client_address, dbd.client_n, name)
     names = ['Gradient_Boosting', 'Random_Forest', 'Neural_Network', 'Adaptive_Boosting', 'Decision_Tree']
     classifiers = [GradientBoostingClassifier(), RandomForestClassifier(n_estimators=10), MLPClassifier(max_iter=1000), AdaBoostClassifier(), DecisionTreeClassifier()]
     scores = model_fit_and_evaluation(names, classifiers, data)
     storage(name, scores, names, classifiers)
-    test_data = data[1]
-    test_labels = test_data[dbd.target_variable]
-    test_features = test_data.drop(dbd.drop_features, axis=1)
+    # test_data = data[1]
+    # test_labels = test_data[dbd.target_variable]
+    # test_features = test_data.drop(dbd.drop_features, axis=1)
 
-    p.evaluate(name, test_features, test_labels)
-    test_features.to_csv('test.csv')
-
-    p.predict(name, 'test.csv')
+    # p.evaluate(name, test_features, test_labels)
 
 
 if __name__ == "__main__":
