@@ -36,7 +36,11 @@ points <- points[c("LATITUDEDD_NUM", "LONGITUDEDD_NUM", "RATING_INT")]
 #----------------
 
 # Retrieves predictor(raster) values from the worldclim database, [global climate data]
-bio <- raster::getData("worldclim", var='bio', res=10)
+require(raster)
+cwd <- getwd()
+path <- paste(cwd, 'wc10', sep = '/')
+hdr <- list.files(path=path, pattern='\\.bil$', full.names = TRUE)
+bio <- stack(hdr)
 
 # Initializes library and looks for colinearity problems in the raster data
 v1 <- vifstep(bio)
