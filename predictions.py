@@ -31,7 +31,7 @@ def find_path(name):
     :return: returns the path as a string.
     '''
     print("[+] Searching for " + name)
-    for root, dirs, files in os.walk(Path("/")):
+    for root, dirs, files in os.walk(str(Path.home())):
 
         if name in files:
             return os.path.join(root, name)
