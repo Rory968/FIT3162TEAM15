@@ -1,7 +1,15 @@
+# Written by Rory Austin id: 28747194
+
 import predictions as p
 import os
 import sys
 
+
+# This file when run takes a file that is present in the system and associates it with
+# a species name the user passes through the command line, when it is run it will fetch the
+# model for the specified species and prep the data for predictions, it will then make
+# these predictions and save them to a new file called 'predictions.xls' in the downloads folder
+# of the system.
 
 def predict(species, data_name):
     '''

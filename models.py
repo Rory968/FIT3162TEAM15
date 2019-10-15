@@ -1,7 +1,12 @@
+# Written by Rory Austin id: 28747194
+
 import pickle
 import pymongo
 import time
 import database_details as dbd
+
+# This file is a helper file for a number of the modelling functions. It provides
+# methods to save and load the model from the database.
 
 
 def save_model(species, model, model_name, acc):

@@ -1,6 +1,12 @@
+# Written by Rory Austin id: 28747194
+
 import pymongo
 import database_details as dbd
 import sys
+
+# This file is used to list the possible arguments for any of the commands that can be used in the application
+# It takes an argument that specifies which list it should print, this is either modelling arguments with 'model'
+# or data and model building arguments with 'data'.
 
 
 def list_names(arg):

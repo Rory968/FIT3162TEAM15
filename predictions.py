@@ -1,3 +1,5 @@
+# Written by Rory Austin id: 28747194
+
 import models as m
 from sklearn import datasets
 from sklearn import metrics
@@ -8,6 +10,13 @@ import pandas as pd
 import database_details as dbd
 import pymongo
 import subprocess
+
+
+# This is a helper file for the predict file, this contains the majority of the
+# prediction logic, evaluate is unused and acts as a backup for accuracy.
+# prep_data converts given data into same format as training data for predictions
+# replace data is used when the data already exists and just needs to be overwritten in the database
+# predict preps and makes predictions on the data, it then saves these to a file called 'predictions.xls'
 
 
 def evaluate(species, test_data, test_labels):

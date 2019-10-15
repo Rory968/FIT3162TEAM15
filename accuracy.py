@@ -1,6 +1,11 @@
+# Written by Rory Austin id: 28747194
+
 import pymongo
 import database_details as dbd
 import sys
+
+# This file when run takes the accuracy for a given species from the models database information and
+# prints it inside the console.
 
 
 def get_acc(species):

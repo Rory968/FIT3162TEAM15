@@ -1,6 +1,11 @@
+# Written by Rory Austin id: 28747194
+
 import pymongo
 import sys
 import database_details as dbd
+
+# This file when run connects to the database and removes all databases containing species
+# information or data.
 
 
 def remove():
