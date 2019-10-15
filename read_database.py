@@ -1,6 +1,7 @@
 # Written by Rory Austin id: 28747194
 import pymongo
 import pandas as pd
+import database_details as dbd
 
 # This is a helper file that reads from a populated MongoDB database
 
@@ -15,7 +16,7 @@ def read_collection(db_name, collection_name):
     :return: returns a pandas data frame containing the required collection data.
     '''
     # !!!Hard coded connection variable!!!
-    client = pymongo.MongoClient('localhost', 27017)
+    client = pymongo.MongoClient(dbd.client_n, dbd.client_address)
     db = client[db_name]
     test_col = db[collection_name]
     df = pd.DataFrame(list(test_col.find()))
