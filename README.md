@@ -1,6 +1,7 @@
 User Guide
 
 -------Setting up the environment------
+
 To set up the system we will need to configure these 3 things
 R and Rstudio
 MongoDB
